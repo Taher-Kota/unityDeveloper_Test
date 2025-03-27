@@ -114,6 +114,87 @@ public partial class @GameInputs: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Hologram"",
+            ""id"": ""7c9635e3-7aca-4f3e-b4d9-1bdb4b503b09"",
+            ""actions"": [
+                {
+                    ""name"": ""CreateHologram"",
+                    ""type"": ""Button"",
+                    ""id"": ""1cecf814-7772-4f0f-92b6-30dab05e4eeb"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ManipulateGravity"",
+                    ""type"": ""Button"",
+                    ""id"": ""059965d3-e7b5-43e5-8898-da0888df75a9"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""5cfaed2f-b4ae-4f7a-9862-40535491a5a4"",
+                    ""path"": ""<Keyboard>/upArrow"",
+                    ""interactions"": ""Hold(duration=0.2,pressPoint=0.25)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CreateHologram"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""325c353d-de97-4adb-9b54-6422217bc2c2"",
+                    ""path"": ""<Keyboard>/downArrow"",
+                    ""interactions"": ""Hold(duration=0.2,pressPoint=0.25)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CreateHologram"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b469aa9b-94f6-4b4c-8428-296961d9bc71"",
+                    ""path"": ""<Keyboard>/leftArrow"",
+                    ""interactions"": ""Hold(duration=0.2,pressPoint=0.25)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CreateHologram"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fece06ff-7ed9-4677-8f56-3908bdd77ee5"",
+                    ""path"": ""<Keyboard>/rightArrow"",
+                    ""interactions"": ""Hold(duration=0.2,pressPoint=0.25)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CreateHologram"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""69fb7dac-7d31-4ef7-95a1-c7b105bb2f99"",
+                    ""path"": ""<Keyboard>/enter"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ManipulateGravity"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -122,6 +203,10 @@ public partial class @GameInputs: IInputActionCollection2, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
+        // Hologram
+        m_Hologram = asset.FindActionMap("Hologram", throwIfNotFound: true);
+        m_Hologram_CreateHologram = m_Hologram.FindAction("CreateHologram", throwIfNotFound: true);
+        m_Hologram_ManipulateGravity = m_Hologram.FindAction("ManipulateGravity", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -233,9 +318,68 @@ public partial class @GameInputs: IInputActionCollection2, IDisposable
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
+
+    // Hologram
+    private readonly InputActionMap m_Hologram;
+    private List<IHologramActions> m_HologramActionsCallbackInterfaces = new List<IHologramActions>();
+    private readonly InputAction m_Hologram_CreateHologram;
+    private readonly InputAction m_Hologram_ManipulateGravity;
+    public struct HologramActions
+    {
+        private @GameInputs m_Wrapper;
+        public HologramActions(@GameInputs wrapper) { m_Wrapper = wrapper; }
+        public InputAction @CreateHologram => m_Wrapper.m_Hologram_CreateHologram;
+        public InputAction @ManipulateGravity => m_Wrapper.m_Hologram_ManipulateGravity;
+        public InputActionMap Get() { return m_Wrapper.m_Hologram; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(HologramActions set) { return set.Get(); }
+        public void AddCallbacks(IHologramActions instance)
+        {
+            if (instance == null || m_Wrapper.m_HologramActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_HologramActionsCallbackInterfaces.Add(instance);
+            @CreateHologram.started += instance.OnCreateHologram;
+            @CreateHologram.performed += instance.OnCreateHologram;
+            @CreateHologram.canceled += instance.OnCreateHologram;
+            @ManipulateGravity.started += instance.OnManipulateGravity;
+            @ManipulateGravity.performed += instance.OnManipulateGravity;
+            @ManipulateGravity.canceled += instance.OnManipulateGravity;
+        }
+
+        private void UnregisterCallbacks(IHologramActions instance)
+        {
+            @CreateHologram.started -= instance.OnCreateHologram;
+            @CreateHologram.performed -= instance.OnCreateHologram;
+            @CreateHologram.canceled -= instance.OnCreateHologram;
+            @ManipulateGravity.started -= instance.OnManipulateGravity;
+            @ManipulateGravity.performed -= instance.OnManipulateGravity;
+            @ManipulateGravity.canceled -= instance.OnManipulateGravity;
+        }
+
+        public void RemoveCallbacks(IHologramActions instance)
+        {
+            if (m_Wrapper.m_HologramActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IHologramActions instance)
+        {
+            foreach (var item in m_Wrapper.m_HologramActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_HologramActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public HologramActions @Hologram => new HologramActions(this);
     public interface IPlayerActions
     {
         void OnMove(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
+    }
+    public interface IHologramActions
+    {
+        void OnCreateHologram(InputAction.CallbackContext context);
+        void OnManipulateGravity(InputAction.CallbackContext context);
     }
 }

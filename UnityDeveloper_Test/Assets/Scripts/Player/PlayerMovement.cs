@@ -26,6 +26,7 @@ public class PlayerMovement : MonoBehaviour
         InputManager.Instance.OnJump += InputManager_OnJump;
     }
 
+
     private void InputManager_OnJump(object sender, System.EventArgs e)
     {
         if (player.isGrounded)
