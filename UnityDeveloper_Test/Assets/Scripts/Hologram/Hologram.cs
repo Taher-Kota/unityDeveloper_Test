@@ -11,7 +11,6 @@ public class Hologram : MonoBehaviour
     [SerializeField] private List<Quaternion> directionList;
     [SerializeField] private List<Vector3> positionList;
     [SerializeField] private GameObject holoGram;
-
     private void Start()
     {
         InputManager.Instance.OnHologramActivate += InputManager_ActivateHologram;

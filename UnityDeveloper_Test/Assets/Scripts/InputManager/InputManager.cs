@@ -15,8 +15,9 @@ public class InputManager : MonoBehaviour
         public string keyName;
     }
     public event EventHandler OnHologramDeacitvate;
-    public event EventHandler OnManipulateGravity;
+    public event EventHandler<OnHologramEventArgs> OnManipulateGravity;
     private bool isHoloActivate;
+    private string currentKeyName;
 
     private void Awake()
     {
@@ -29,26 +30,36 @@ public class InputManager : MonoBehaviour
         gameInputs.Hologram.ManipulateGravity.performed += ManipulateGravity_performed;
     }
 
+    private void OnDestroy()
+    {
+        gameInputs.Dispose();
+    }
+
     private void ManipulateGravity_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         if (isHoloActivate)
         {
-            OnManipulateGravity?.Invoke(this, EventArgs.Empty);
+            OnManipulateGravity?.Invoke(this, new OnHologramEventArgs
+            {
+                keyName = currentKeyName
+            });
         }
     }
 
     private void CreateHologram_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         isHoloActivate = true;
+        currentKeyName = obj.control.name;
         OnHologramActivate?.Invoke(this, new OnHologramEventArgs
         {
-            keyName = obj.control.name
+            keyName = currentKeyName
         });
     }
 
     private void CreateHologram_canceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         isHoloActivate = false;
+        currentKeyName = null;
         OnHologramDeacitvate?.Invoke(this, EventArgs.Empty);
     }
 

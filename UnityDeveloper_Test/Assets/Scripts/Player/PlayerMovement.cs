@@ -1,90 +1,39 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem.Controls;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public static PlayerMovement instance;
-    private CharacterController player;
-    private Vector3 moveDirection;
+    [SerializeField] private float speed = 5f;
+    [SerializeField] private float rotationSpeed = 4f;
 
-    [SerializeField] private float moveSpeed = 5f , rotationSpeed;
-    [SerializeField] private float verticalVelocity, gravityForce, jumpForce;
+    private Rigidbody rb;
 
-    private void Awake()
+    void Start()
     {
-        instance = this;
-        player = GetComponent<CharacterController>();
-        gravityForce = 9.8f;
-        jumpForce = 4f;
-        rotationSpeed = 5f;
+        rb = GetComponent<Rigidbody>();
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
-    private void Start()
+    private void FixedUpdate()
     {
-        InputManager.Instance.OnJump += InputManager_OnJump;
+        MovePlayer();
     }
 
-
-    private void InputManager_OnJump(object sender, System.EventArgs e)
+    void MovePlayer()
     {
-        if (player.isGrounded)
+        Vector2 inputVector = InputManager.Instance.GetNormalizedVector2Movement();
+        Vector3 moveDirection = transform.right * inputVector.x + transform.forward * inputVector.y;
+
+        if (moveDirection.magnitude > .1f)
         {
-            verticalVelocity = jumpForce;
+            RotatePlayer(moveDirection);
         }
+
+        rb.MovePosition(rb.position + moveDirection * speed * Time.deltaTime);
     }
 
-    private void Update()
+    void RotatePlayer(Vector3 moveDirection)
     {
-        HandleMovement();
-        ApplyGravity();
-        player.Move(moveDirection * Time.deltaTime);
-    }
-
-    private void HandleMovement()
-    {
-        if (player.isGrounded)
-        {
-            if (verticalVelocity < 0) // if player is not jumping
-            {
-                verticalVelocity = -1f; // Apply downward gravity force
-            }
-        }
-        // Get input direction
-        Vector2 direction = InputManager.Instance.GetNormalizedVector2Movement();
-        if (direction.y < 0) direction.y = 0; //prevents moving in any direction except its forward while jumping
-        moveDirection = new Vector3(direction.x, 0f, direction.y);
-        moveDirection = transform.TransformDirection(moveDirection) * moveSpeed;
-
-        HandleRotation(moveDirection);
-    }
-
-    private void HandleRotation(Vector3 moveDirection)
-    {
-        if (moveDirection.sqrMagnitude > 0.01f) // Ensure there's movement
-        {
-            Quaternion targetDirection = Quaternion.LookRotation(moveDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetDirection, rotationSpeed * Time.deltaTime);
-        }
-    }
-
-    private void ApplyGravity()
-    {
-        if (!player.isGrounded)
-        {
-            verticalVelocity -= gravityForce * Time.deltaTime;
-        }
-        moveDirection.y = verticalVelocity;
-    }
-
-    public bool IsRunning()
-    {
-        return player.isGrounded && moveDirection.sqrMagnitude > 1f;
-    }
-
-    public bool IsJumping()
-    {
-        return !player.isGrounded;
+        Quaternion targetRotation = Quaternion.LookRotation(moveDirection, transform.up);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
     }
 }

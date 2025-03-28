@@ -15,7 +15,7 @@ public class PlayerAnimation : MonoBehaviour
 
     private void Update()
     {
-        animator.SetBool(RUNNING_BOOL, PlayerMovement.instance.IsRunning());
-        animator.SetBool(JUMP_BOOL, PlayerMovement.instance.IsJumping());
+        //animator.SetBool(RUNNING_BOOL, PlayerMovement.instance.IsRunning());
+        //animator.SetBool(JUMP_BOOL, PlayerMovement.instance.IsJumping());
     }
 }
