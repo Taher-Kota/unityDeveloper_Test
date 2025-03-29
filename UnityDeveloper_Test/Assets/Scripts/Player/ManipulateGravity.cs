@@ -12,6 +12,7 @@ public class ManipulateGravity : MonoBehaviour
     private Rigidbody rb;
     private Vector3 velocity;
     private Vector3 gravityDirection = Vector3.down; // Default gravity
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();

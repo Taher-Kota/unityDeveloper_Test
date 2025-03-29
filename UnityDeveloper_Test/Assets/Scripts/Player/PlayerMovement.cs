@@ -1,15 +1,23 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public static PlayerMovement Instance;
     [SerializeField] private float speed = 5f;
     [SerializeField] private float rotationSpeed = 4f;
+    private Vector3 moveDirection;
 
     private Rigidbody rb;
 
+    private void Awake()
+    {
+        Instance = this;
+        rb = GetComponent<Rigidbody>();
+    }
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
         Cursor.lockState = CursorLockMode.Locked;
     }
 
@@ -21,7 +29,7 @@ public class PlayerMovement : MonoBehaviour
     void MovePlayer()
     {
         Vector2 inputVector = InputManager.Instance.GetNormalizedVector2Movement();
-        Vector3 moveDirection = transform.right * inputVector.x + transform.forward * inputVector.y;
+        moveDirection = transform.right * inputVector.x + transform.forward * inputVector.y;
 
         if (moveDirection.magnitude > .1f)
         {
@@ -36,4 +44,10 @@ public class PlayerMovement : MonoBehaviour
         Quaternion targetRotation = Quaternion.LookRotation(moveDirection, transform.up);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
     }
+
+    public bool IsRunning()
+    {
+        return moveDirection.magnitude > 0.1f;
+    }
+
 }

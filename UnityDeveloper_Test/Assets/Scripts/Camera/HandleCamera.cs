@@ -4,7 +4,7 @@ public class HandleCamera : MonoBehaviour
 {
     [SerializeField] private float mouseSensitivity = 100f;
 
-    private float xAxisRotation = 0f;  // Up-Down (Pitch)
+    private float xAxisRotation = 0f;  // Up-Down
 
     void Start()
     {
@@ -27,7 +27,7 @@ public class HandleCamera : MonoBehaviour
 
         transform.localRotation = Quaternion.Euler(xAxisRotation, 0f, 0f);
 
-        // Rotate only the camera (Left-Right)
+        // Rotate both the camera and pkayer (Left-Right)
         transform.parent.Rotate(Vector3.up * mouseX);
     }
 }

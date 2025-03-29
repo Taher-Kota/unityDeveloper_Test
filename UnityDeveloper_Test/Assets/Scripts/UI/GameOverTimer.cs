@@ -11,7 +11,7 @@ public class GameOverTimer : MonoBehaviour
 
     private void Awake()
     {
-        countDownTimer = 10;
+        countDownTimer = GameManager.Instance.GetGamePlayingTime();
         timer.text = countDownTimer.ToString();
     }
 
@@ -26,9 +26,7 @@ public class GameOverTimer : MonoBehaviour
             timer.text = minutes.ToString() + ":" + seconds.ToString();
             if (countDownTimer <= 0)
             {
-                Cursor.lockState = CursorLockMode.None;
                 timer.text = "0:00";
-                GameManager.Instance.GameOver();
             }
         }
     }

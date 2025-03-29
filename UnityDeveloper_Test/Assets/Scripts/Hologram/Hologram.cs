@@ -8,9 +8,11 @@ public class Hologram : MonoBehaviour
     private const string DOWNARROWKEY = "downArrow";
     private const string LEFTARROWKEY = "leftArrow";
     private const string RIGHTARROWKEY = "rightArrow";
+
     [SerializeField] private List<Quaternion> directionList;
     [SerializeField] private List<Vector3> positionList;
     [SerializeField] private GameObject holoGram;
+
     private void Start()
     {
         InputManager.Instance.OnHologramActivate += InputManager_ActivateHologram;
