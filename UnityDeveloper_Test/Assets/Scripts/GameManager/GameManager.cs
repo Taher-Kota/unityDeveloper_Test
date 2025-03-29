@@ -36,7 +36,6 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        print(isJumping);
         if (IsGamePlaying())
         {
             CheckPlayerGrounded();
